@@ -1,0 +1,27 @@
+#text1 {
+    color: rgb(58, 12, 222);
+    font-size: 30px;
+}
+
+#text2 {
+    position:sticky;
+    left: 200px;
+}
+
+body {
+    background-color: lightblue;
+  }
+
+div {
+    padding: 15px;
+}
+
+input {
+    position: sticky;
+    left: 200px;
+}
+
+span {
+    position: sticky;
+    left: 200px;
+}

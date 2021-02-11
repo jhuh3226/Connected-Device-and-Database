@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+
+    <!-- needs to be CDN(content delivery network) for Arduino to communicate -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.1.9/p5.min.js" integrity="sha512-WIklPM6qPCIp6d3fSSr90j+1unQHUOoWDS4sdTiR8gxUTnyZ8S2Mr8e10sKKJ/bhJgpAa/qG068RDkg6fIlNFA==" crossorigin="anonymous"></script>
+    <script language="javascript" type="text/javascript" src="https://cdn.jsdelivr.net/npm/p5.serialserver@0.0.29/lib/p5.serialport.js"></script>
+    <script src="script.js"></script>  
+    <meta charset="utf-8">
+      
+    <script>let clicks = 0;</script>
+    <title>Connected device 1st session</title>
+
+</head>
+
+<body>
+    <!--drop down serial port code -->
+    <div><section id="serialport">Reload this page with p5.serialcontrol open, then select a serial port: <select id="portSelector"></select></section></div>
+
+    <div id="text1">Button Click </div>
+    <!--create a button to start listening-->
+    <div><label for="start">Start: </label><input type="button" id="start" value="start"></div>
+    <div>Button clicked: <span id="clicks">0</span></div>
+</body>
+
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Auto Name Card Generator</title>
+    <!--connect source for qr code-->
+    <script src="https://unpkg.com/qrcode-generator@1.4.4/qrcode.js"></script>
+
+    <link rel="stylesheet" href="style.css" />
+    <!--source attribute-->
+    <script src="script.js"></script>
+</head>
+
+<body>
+    <div class="topnav">
+        <a>Auto Name Card Generator</a>
+    </div>
+
+    <!--data in name is what sent to the user-->
+    <div id=mainText><label for="data"> Enter Details to Create Your Name Card</label></div>
+    <div id=mainInput><input type="text" name="name" value="Enter Name">
+        <br><br>
+        <input type="text" name="phone" value="Enter Phone Number">
+
+        <br><br>
+        <input type="text" name="email" value="Enter Email or Site">
+        <br><br>
+        Background Color of Your Namecard &nbsp&nbsp <input type="color" name="color">
+        <br><br>
+        <label for="bt"></label><input type="button" id="button" value="click">
+        <br><br>
+        <div id='qrCode' name="qrCode"></div>
+    </div>
+
+</body>
+
+</html>

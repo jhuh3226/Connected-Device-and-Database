@@ -1,0 +1,43 @@
+html {
+  text-align: center;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+#text{
+  margin-top: 2em;
+  color:white;
+}
+
+#date{
+  font-size: small;
+  color:cadetblue;
+}
+
+#logging{
+  margin-top: 1.8em;
+  padding-top: 1.8em;
+}
+
+#newLogDistance{
+  color:aqua;
+}
+
+#newLogMicrophone{
+  color:aqua;
+  /* color:rgb(0, 255, 115); */
+}
+
+
+#feedbackThresAdjust{
+  color: red;
+}
+
+
+#lineBreak{
+  margin-top: 2em;
+}
+
+body {
+  background-color:rgb(0,0,0);
+  /* max-width: 800px; */
+}

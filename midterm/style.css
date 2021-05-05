@@ -1,0 +1,8 @@
+input {
+    position: sticky;
+    left: 120px;
+  }
+  
+  body {
+    max-width: 800px;
+  }

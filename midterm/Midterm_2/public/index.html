@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Keep Track</title>
+    <!--connect source for qr code-->
+    <script src="https://unpkg.com/qrcode-generator@1.4.4/qrcode.js"></script>
+
+    <link rel="stylesheet" href="style.css" />
+    <!--source attribute-->
+    <script src="script.js"></script>
+</head>
+
+<body>
+    <div class="topnav">
+        <a>Keep track of your day and your memories</a>
+    </div>
+
+    <!--when form data submited, send to router(at server.js)-->
+    <form method="POST" action="/formdata">
+        <!--data in name is what sent to the user-->
+        <div id=mainText><label for="data"> Begin your journal</label></div>
+        <div id=mainInput><input type="datetime-local" id="time" name="time">
+            <br><br>
+            <textarea name="paragraph_text" value="Begin your journal" cols="50" rows="10"></textarea>
+        </div>
+        <div id=mainText> Text color <input type="color" name="color">
+            <br><br>
+            <input type="submit" name="submit" value="submit">
+        </div>
+    </form>
+
+</body>
+
+</html>

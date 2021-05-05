@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Connected device week8</title>
+    <link rel="stylesheet" href="style.css" />
+    <!--source attribute-->
+    <script src="script.js"></script>
+</head>
+
+<body>
+
+    <!--when form data submited, send to router(at server.js)-->
+    <form method="POST" action="/formdata">
+        <!--data in name is what sent to the user-->
+        <div><label for="data"> Get data</label></div>
+        <div><input type="datetime-local" id="time" name="time">
+            <input type="submit" name="submit" value="submit">
+        </div>
+    </form>
+
+</body>
+
+</html>

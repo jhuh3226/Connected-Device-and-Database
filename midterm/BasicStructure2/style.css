@@ -1,0 +1,20 @@
+html {
+    text-align: center;
+    font-family: 'Courier New', Courier, monospace;
+  }
+  
+  
+  #text{
+    margin: 2em;
+    color:white;
+  }
+  
+  /* #logging{
+    margin-top: 3em;
+    padding-top: 3em;
+  } */
+  
+  body {
+    background-color:rgb(0,0,0);
+    /* max-width: 800px; */
+  }

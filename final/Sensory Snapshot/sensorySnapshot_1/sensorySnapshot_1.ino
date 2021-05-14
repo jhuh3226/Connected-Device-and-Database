@@ -42,6 +42,7 @@ const char server[] = SECRET_SERVER;  // server name
 const int port = 80;
 String route = "/data";   // API route:
 const char contentType[] = "application/json";    // set the content type:
+bool postingData = false;
 
 /*SD card*/
 File root;    //define data read write variables
@@ -56,8 +57,8 @@ String fileNameByDate = "";
 Switch Shutter = Switch(4);  // GPIO 4, create Switch button
 int shutterLedPin = 7;  // LED Pin for shutter
 int wifiSwitchPin = 6;
+int lastwifiSwitchState = 1;    // previous state of the switch pin
 int wifiLedPin = 8;  // LED pin for wifi status
-int lastwifiSwitchState = 1;
 
 const int PRESS_TIME  = 5000;   // variables for time thresholds
 
@@ -170,115 +171,116 @@ void loop() {
     connectToNetwork();
   }
 
-  // check
-  //  Serial.println(digitalRead(wifiSwitchPin));
-  //  delay(1);
-  //  Serial.println(fileNameSum  + ".txt");
-
-
   //------------------if shutter is pressed--------------------//
   Shutter.poll();
-  if (Shutter.released()) {
-    Serial.println("Button was pressed");
-    pressedTime = millis();
-    isPressing = true;
-    isDetected = false;
-    digitalWrite(shutterLedPin, HIGH);
 
-    // randNumber = random(1, 50);
-    // sumRandNumber += randNumber;
-    // creating new file name
-    fileNameCreator();    // function generating file name based on RTC
-    fileName = String(fileNameByDate);
+  // enable button press only when it's not sending data
+  if (!postingData) {
+    if (Shutter.released()) {
+      Serial.println("Button was pressed");
+      pressedTime = millis();
+      isPressing = true;
+      isDetected = false;
+      digitalWrite(shutterLedPin, HIGH);
 
-    record = true;  // start recording
+      // randNumber = random(1, 50);
+      // sumRandNumber += randNumber;
+      // creating new file name
+      fileNameCreator();    // function generating file name based on RTC
+      fileName = String(fileNameByDate);
+
+      record = true;  // start recording
+    }
   }
 
   //---------------------button is released---------------------//
-  if (Shutter.pushed()) {
-    Serial.println("Button was released");
-    isPressing = false;
-    releasedTime = millis();
-    long pressDuration = releasedTime - pressedTime;
-    timeRecorded = false;
+  // enable button press only when it's not sending data
+  if (!postingData) {
+    if (Shutter.pushed()) {
+      Serial.println("Button was released");
+      isPressing = false;
+      releasedTime = millis();
+      long pressDuration = releasedTime - pressedTime;
+      timeRecorded = false;
 
-    digitalWrite(shutterLedPin, LOW);
+      digitalWrite(shutterLedPin, LOW);
 
-    // if press time is shorter than 5 seconds, do nothing
-    if ( pressDuration < PRESS_TIME) {
-      record = false;  // stop recording
-      display.clearDisplay();
-      displayNotRecorded();   // tell user that data is not recorded
-      displayWifiStatus();
-      displaySDCardStatus();
-      displayTime();
+      // if press time is shorter than 5 seconds, do nothing
+      if ( pressDuration < PRESS_TIME) {
+        record = false;  // stop recording
+        display.clearDisplay();
+        displayNotRecorded();   // tell user that data is not recorded
+        displayWifiStatus();
+        displaySDCardStatus();
+        displayTime();
 
-      Serial.println("Button was pressed for less than 5 seconds. Recording failed.");
+        Serial.println("Button was pressed for less than 5 seconds. Recording failed.");
+      }
+
+      // resetting  values
+      // initialize all sum values to 0
+      sumColorTemp = 0;
+      sumLux = 0;
+      sumR = 0;
+      sumG = 0;
+      sumB = 0;
+      sumH = 0;
+      sumT = 0;
+      sumHic = 0;
+      fileNameByDate = "";  // set file name to empty
     }
 
-    // resetting  values
-    // initialize all sum values to 0
-    sumColorTemp = 0;
-    sumLux = 0;
-    sumR = 0;
-    sumG = 0;
-    sumB = 0;
-    sumH = 0;
-    sumT = 0;
-    sumHic = 0;
-    fileNameByDate = "";  // set file name to empty
-  }
+    //----------if press duration is longer than 5 seconds----------//
+    else if (isPressing == true && isDetected == false) {
+      long pressDuration = millis() - pressedTime;
+      Serial.println("recording");
 
-  //----------if press duration is longer than 5 seconds----------//
-  else if (isPressing == true && isDetected == false) {
-    long pressDuration = millis() - pressedTime;
-    Serial.println("recording");
+      if ( pressDuration > PRESS_TIME ) {
+        record = false;   // if user presses more than 5 seconds, stop recording the sensor value
 
-    if ( pressDuration > PRESS_TIME ) {
-      record = false;   // if user presses more than 5 seconds, stop recording the sensor value
+        // make JSON object with the recorded data
+        bodyPieces["dateTime"]   = firstDateTime;
+        bodyPieces["colorTemp"] = sumColorTemp / 7;
+        bodyPieces["lux"] = sumLux / 7;
+        bodyPieces["r"] = sumR / 7;
+        bodyPieces["g"] = sumB / 7;
+        bodyPieces["b"] = sumB / 7;
+        bodyPieces["humidity"] = sumH / 7;
+        bodyPieces["temperature"] = sumT / 7;
+        bodyPieces["heatIndex"] = sumHic / 7;
 
-      // make JSON object with the recorded data
-      bodyPieces["dateTime"]   = firstDateTime;
-      bodyPieces["colorTemp"] = sumColorTemp / 7;
-      bodyPieces["lux"] = sumLux / 7;
-      bodyPieces["r"] = sumR / 7;
-      bodyPieces["g"] = sumB / 7;
-      bodyPieces["b"] = sumB / 7;
-      bodyPieces["humidity"] = sumH / 7;
-      bodyPieces["temperature"] = sumT / 7;
-      bodyPieces["heatIndex"] = sumHic / 7;
+        display.clearDisplay();
+        displayRecorded();    // tell user status
+        displayWifiStatus();
+        displaySDCardStatus();
+        displayTime();
 
-      display.clearDisplay();
-      displayRecorded();    // tell user status
-      displayWifiStatus();
-      displaySDCardStatus();
-      displayTime();
+        Serial.println("Recording data");
+        Serial.println("Button was pressed for more than 5 seconds.");
 
-      Serial.println("Recording data");
-      Serial.println("Button was pressed for more than 5 seconds.");
+        // Create new file
+        Serial.print("Creating new file named ");
+        Serial.print(fileName + String(".txt"));
+        Serial.println(".....");
 
-      // Create new file
-      Serial.print("Creating new file named ");
-      Serial.print(fileName + String(".txt"));
-      Serial.println(".....");
+        // open the file. note that only one file can be open at a time,
+        // so you have to close this one before opening another.
+        root = SD.open(fileName + String(".txt"), FILE_WRITE);
 
-      // open the file. note that only one file can be open at a time,
-      // so you have to close this one before opening another.
-      root = SD.open(fileName + String(".txt"), FILE_WRITE);
-
-      // if the file opened okay, write to it:
-      if (root) {
-        Serial.print("Writing to data.txt...");
-        body["data"][0] = bodyPieces;
-        root.println(JSON.stringify(body));
-        Serial.println("Written: " + JSON.stringify(body));
-        root.close();   //close the file
-        Serial.println("Writing done. Closed.");
-      } else {
-        //  if the file didn't open, print an error:
-        Serial.println("error opening file");
+        // if the file opened okay, write to it:
+        if (root) {
+          Serial.print("Writing to data.txt...");
+          body["data"][0] = bodyPieces;
+          root.println(JSON.stringify(body));
+          Serial.println("Written: " + JSON.stringify(body));
+          root.close();   //close the file
+          Serial.println("Writing done. Closed.");
+        } else {
+          //  if the file didn't open, print an error:
+          Serial.println("error opening file");
+        }
+        isDetected = true;
       }
-      isDetected = true;
     }
   }
 
@@ -447,7 +449,11 @@ void serverConnect() {
           root.rewindDirectory();   // didn't get the 200, then rewind the directory
         }
       }
+
+      // check still posting is in progress
+      postingData = true;
     }
+    postingData = false;
   }
 }
 /*---------------------------------------------------------------------------------------------*/
